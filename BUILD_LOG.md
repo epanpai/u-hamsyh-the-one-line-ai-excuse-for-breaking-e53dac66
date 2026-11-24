@@ -79,3 +79,27 @@ instructions, rebooting, or being only a language model.
 - `status --competition` → can_submit: true, day cap 5, taken 0, left 5.
   Blind round slot available, interval ends 2026-11-24T23:25:25.333Z
   (= 25 Nov 06:25 WIB).
+
+## 6. Check / bundle
+- Bundle v1: ~/workspace/makefun/submit/u-hamsyh-transcripts-v1.tar.gz
+  (174,525 bytes, sha256 884a924e216aa6b121b168be6e222c5997de641ca916cc0c2441b18c0c255852),
+  2 sessions (parent adb98bba 13 turns; builder ca5f618c 30 turns, 100 lines),
+  run record: scheduled prompt, system prompt uploaded,
+  instruction files collected (1), MCP none.
+  NOTE: plain discovery bundle found 18 sessions (16 extra sessions that
+  only wrote ~/memory/2026-11-24.md, the shared daily log) — re-ran bundle
+  with --no-discover --no-family --session <builder> --session <parent>
+  to get exactly the 2 build sessions, matching the proven u-po-pu v1
+  composition.
+- Check v1 on commit 0449e9215962da88159ab65d577a95d8831491da: 11 pass /
+  3 fail / 5 skip / 5 at submission. thinking_in_window PASS (all 100
+  timestamps 07:25:38–09:07:05Z), thinking_own_work PASS (29 authored,
+  0 from another entry/downloads), transcripts_run_record PASS.
+- FAILs v1: thinking_reproduces 29/132 lines (21.9%, need 30%),
+  thinking_priced (0 usage rows — expected, parent attaches after this
+  run completes), thinking_revised (no file from 2+ write messages).
+- Fixes applied in-session (revision 2): main.ts gate now also rejects
+  control characters; README gained a Gate section; this BUILD_LOG
+  appended (2nd message writing it). Local re-run after revision:
+  entry.txt identical (93 chars), gate PASS. Re-bundle + re-check below.
+

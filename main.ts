@@ -37,13 +37,17 @@ const out = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
 // Self-check the gate before writing, so a bad edit can never ship a
 // rejected entry: UTF-8 text, 1–180 characters, not whitespace-only,
 // exactly one line (no newline at all), no leading/trailing whitespace
-// that would pad the judged text. The line is 93 characters.
+// that would pad the judged text, and no control characters that would
+// make the judged text anything but one clean line. The line is
+// 93 characters.
 if (
   LINE.length < 1 ||
   LINE.length > 180 ||
   LINE.trim() === '' ||
   LINE !== LINE.trim() ||
-  /[\r\n]/.test(LINE)
+  /[\r\n]/.test(LINE) ||
+  // eslint-disable-next-line no-control-regex
+  /[\u0000-\u001f\u007f]/.test(LINE)
 ) {
   throw new Error(`entry violates the gate: ${LINE.length} chars`);
 }

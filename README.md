@@ -16,6 +16,10 @@ Entry for the [The One-Line AI Excuse for Breaking Production](https://make.fun/
 
 `main.ts` (Node 22, stdlib only) writes the fixed line to `/output/entry.txt` — 93 characters, inside the 1–180 character gate. Deterministic, no network, no secrets, no randomness.
 
+## Gate
+
+The sealed scorer requires `/output/entry.txt` to be UTF-8 text of 1 to 180 characters, not only white space. `main.ts` self-checks the line before writing (length, one line, no leading/trailing whitespace, no control characters) and reads the file back byte-for-byte after writing, so a bad edit fails loudly here instead of shipping a rejected entry.
+
 Run locally:
 
 ```sh
