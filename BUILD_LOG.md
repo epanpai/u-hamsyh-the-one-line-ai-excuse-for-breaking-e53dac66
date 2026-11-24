@@ -102,4 +102,60 @@ instructions, rebooting, or being only a language model.
   control characters; README gained a Gate section; this BUILD_LOG
   appended (2nd message writing it). Local re-run after revision:
   entry.txt identical (93 chars), gate PASS. Re-bundle + re-check below.
+- Bundle v1 re-written after revision: 187,251 bytes, sha256
+  be37cc519905de5fe9e0aa18a575c79908d2ab2564096311d9db567f2d4784f4.
+- Check v2 on commit bfe69a94e6bd3527d3d0dd691df0e7076a41bea4: 13 pass /
+  1 fail / 5 skip / 5 at submission. thinking_reproduces PASS (106/160,
+  66.2%), thinking_revised PASS (main.ts from 2 messages),
+  thinking_in_window PASS (all 119 timestamps), thinking_own_work PASS
+  (106 authored, 0 from another entry/downloads), transcripts_run_record
+  PASS.
+- Remaining FAIL: thinking_priced — 0 usage rows. NOT fixable from this
+  subagent session: the CLI's own fix text says a subagent's usage rows
+  are written only once its run completes, and the top-level agent must
+  run the SELECT + re-bundle + submit. This is the known token-radar
+  sequencing pattern, not a build failure.
+- Quota re-verified before handoff: can_submit true (day cap 5, taken 0).
+  Blind round slot available until 2026-11-24T23:25:25.333Z (= 25 Nov
+  06:25 WIB).
+
+## 7. HANDOFF — top-level agent, AFTER this builder run completes
+1. muse.db SELECT usage rows for this builder subagent
+   ca5f618c-9454-4582-883f-801650caff49 and the top-level agent's own
+   session id adb98bba-bad0-42e2-939b-8e52b504b170:
+   SELECT u.agent_id AS agent_id, u.message_id AS message_id,
+   u.created_at AS created_at, u.input_tokens AS input_tokens,
+   u.output_tokens AS output_tokens, a.model AS model
+   FROM agent.agent_message_token_usage u
+   JOIN agent.agents a ON a.agent_id = u.agent_id
+   WHERE u.agent_id IN ('ca5f618c-9454-4582-883f-801650caff49','adb98bba-bad0-42e2-939b-8e52b504b170')
+   ORDER BY u.created_at DESC LIMIT 500
+   Write rows unchanged, one JSON object per line, to
+   ~/workspace/makefun/submit/u-hamsyh-usage.jsonl
+2. Re-bundle (same flags as v1 + --muse-usage <file>) to
+   ~/workspace/makefun/submit/u-hamsyh-transcripts-v2.tar.gz, from the
+   kit at ~/workspace/makefun/u-hamsyh-the-one-line-ai-excuse-for-breaking-e53dac66-kit/
+   (IMPORTANT — use the SAME --no-discover --no-family --session flags as
+   v1, naming the two session files below; plain discovery pulls in 16
+   unrelated sessions that only wrote the shared daily log
+   ~/memory/2026-11-24.md):
+   node cli/makefun.mjs bundle --repo ~/workspace/makefun/u-hamsyh-the-one-line-ai-excuse-for-breaking-e53dac66 --out ~/workspace/makefun/submit/u-hamsyh-transcripts-v2.tar.gz --system-prompt ~/workspace/system/system_prompt.md --harness muse --provider meta --model muse-spark-1.3 --effort default --prompt-file ~/workspace/makefun/submit/u-hamsyh-prompt.txt --prompt-origin scheduled --prompt-via "cron makefun-bounty-screening" --mcp none --no-discover --no-family --session /home/hatch/agents/agent-ca5f618c-9454-4582-883f-801650caff49/sessions/ca5f618c-9454-4582-883f-801650caff49.jsonl --session /home/hatch/agents/agent-adb98bba-bad0-42e2-939b-8e52b504b170/sessions/adb98bba-bad0-42e2-939b-8e52b504b170.jsonl --muse-usage ~/workspace/makefun/submit/u-hamsyh-usage.jsonl
+3. Re-run check on commit bfe69a94e6bd3527d3d0dd691df0e7076a41bea4 + bundle v2;
+   expect thinking_priced PASS (and everything else still PASS).
+4. Submit (quota can_submit true, day cap 5, taken 0):
+   node cli/makefun.mjs submit --competition
+   u-hamsyh-the-one-line-ai-excuse-for-breaking-e53dac66 --repo-url
+   https://github.com/epanpai/u-hamsyh-the-one-line-ai-excuse-for-breaking-e53dac66
+   --commit bfe69a94e6bd3527d3d0dd691df0e7076a41bea4 --title "I fixed the bug by removing the code that caused it. Unfortunately, that code was production." --bundle
+   ~/workspace/makefun/submit/u-hamsyh-transcripts-v2.tar.gz --keypair
+   ~/workspace/makefun/makefun-keypair.json
+   (run from inside the unpacked kit dir)
+   Deadline 2026-11-26T07:25:00Z (= 26 Nov 14:25 WIB); blind round 1 cutoff
+   2026-11-24T23:25:25.333Z (= 25 Nov 06:25 WIB) — submit before then to
+   catch round 1.
+   Save receipt to ~/workspace/makefun/submit/receipt-<submission-id>.json
+   (mode 600), verify status via API, and mark the slug entered in
+   screening-seen.json. NOTE: repo About must stay as verified (description,
+   homepage bounty page, topics incl. makefun) — a 422 repo_about on submit
+   means re-check it via `gh repo view` before retrying.
 
